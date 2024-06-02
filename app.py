@@ -11,6 +11,7 @@ from resource_stacks.custom_ec2_with_ebs_piops import CustomEc2PiopsStack
 from resource_stacks.custom_webserver_alb import CustomWebserverAlbStack
 from resource_stacks.custom_vpc import CustomVpcStack
 from resource_stacks.vpc_stack import VpcStack
+from resource_stacks.custom_parameters_ssm_secret import CustomParametersSsmSecretStack
 
 from aws_cdk import Environment
 from aws_cdk import Tags
@@ -18,11 +19,11 @@ from aws_cdk import Tags
 app = cdk.App()
 
 # Custom VPC stack
-vpc_stack = VpcStack(app, "custom-vpc-stack",
-               env=Environment(account=app.node.get_context('envs')['prod']['account'],
-                               region=app.node.get_context('envs')['prod']['region']
-                              )
-              )
+# vpc_stack = VpcStack(app, "custom-vpc-stack",
+#                env=Environment(account=app.node.get_context('envs')['prod']['account'],
+#                                region=app.node.get_context('envs')['prod']['region']
+#                               )
+#               )
 
 # Custom Ec2 stack
 # CustomEc2Stack(app, "custom-ec2-stack",
@@ -50,12 +51,17 @@ vpc_stack = VpcStack(app, "custom-vpc-stack",
 # env= Environment(account="003639982821", region="eu-central-1"
 
 
-CustomWebserverAlbStack(app, "custom-webserver-alb-stack", vpc = vpc_stack.vpc,
-                         env=Environment(account=app.node.get_context('envs')['prod']['account'],
-                                         region=app.node.get_context('envs')['prod']['region']
-                                        )
-                        )
+# CustomWebserverAlbStack(app, "custom-webserver-alb-stack", vpc = vpc_stack.vpc,
+#                          env=Environment(account=app.node.get_context('envs')['prod']['account'],
+#                                          region=app.node.get_context('envs')['prod']['region']
+#                                         )
+#                         )
 
-Tags.of(app).add("email", app.node.try_get_context('envs')['prod']['email'])
+# Tags.of(app).add("email", app.node.try_get_context('envs')['prod']['email'])
 
+CustomParametersSsmSecretStack(app, "custom-parameters-ssm-secret-stack",
+                               env=Environment(account=app.node.get_context('envs')['prod']['account'],
+                                               region=app.node.get_context('envs')['prod']['region']
+                                              )
+)
 app.synth()
