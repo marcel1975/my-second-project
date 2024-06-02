@@ -3,11 +3,14 @@ import os
 
 import aws_cdk as cdk
 
-from resource_stacks.custom_vpc import CustomVpcStack
+# from resource_stacks.custom_vpc import CustomVpcStack
 from resource_stacks.custom_ec2 import CustomEc2Stack
 from resource_stacks.custom_ec2_with_profile import CustomEc2WithProfileStack
 from resource_stacks.custom_ec2_with_latest_ami import CustomEc2LatestAmiStack
 from resource_stacks.custom_ec2_with_ebs_piops import CustomEc2PiopsStack
+from resource_stacks.custom_webserver_alb import CustomWebserverAlbStack
+from resource_stacks.custom_vpc import CustomVpcStack
+from resource_stacks.vpc_stack import VpcStack
 
 from aws_cdk import Environment
 from aws_cdk import Tags
@@ -15,11 +18,11 @@ from aws_cdk import Tags
 app = cdk.App()
 
 # Custom VPC stack
-# CustomVpcStack(app, "custom-vpc-stack",
-#                env=Environment(account=app.node.get_context('envs')['prod']['account'],
-#                                region=app.node.get_context('envs')['prod']['region']
-#                               )
-#               )
+vpc_stack = VpcStack(app, "custom-vpc-stack",
+               env=Environment(account=app.node.get_context('envs')['prod']['account'],
+                               region=app.node.get_context('envs')['prod']['region']
+                              )
+              )
 
 # Custom Ec2 stack
 # CustomEc2Stack(app, "custom-ec2-stack",
@@ -46,12 +49,12 @@ app = cdk.App()
 
 # env= Environment(account="003639982821", region="eu-central-1"
 
-CustomEc2PiopsStack(app, "custom-ec2-stack-with-ebs-piops",
-                           env=Environment(account=app.node.get_context('envs')['prod']['account'],
-                                             region=app.node.get_context('envs')['prod']['region']
-                                            )
-                            )
-                                           
+
+CustomWebserverAlbStack(app, "custom-webserver-alb-stack", vpc = vpc_stack.vpc,
+                         env=Environment(account=app.node.get_context('envs')['prod']['account'],
+                                         region=app.node.get_context('envs')['prod']['region']
+                                        )
+                        )
 
 Tags.of(app).add("email", app.node.try_get_context('envs')['prod']['email'])
 
